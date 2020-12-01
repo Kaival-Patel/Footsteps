@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "711931011617",
+    "firebase_url": "https://footsteps-19f8a.firebaseio.com",
+    "project_id": "footsteps-19f8a",
+    "storage_bucket": "footsteps-19f8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711931011617:android:272740e1471b8d636d7960",
+        "android_client_info": {
+          "package_name": "com.kaival.footsteps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711931011617-6s8lfi23qornblsbuv9cheg6vf9o611t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsE4-5D5OeQ_IyEXi0jbAxXa77XAhHbyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711931011617-6s8lfi23qornblsbuv9cheg6vf9o611t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
