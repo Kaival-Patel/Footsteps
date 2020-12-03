@@ -279,7 +279,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
           .child(senderUid)
           .child('Notifications')
           .child('Outgoing Tracking Request')
-          .child(DateTime.now().microsecondsSinceEpoch.toString())
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
           .set({
             'type':'outgoing_tracking_request',
             'to':recipientUid,
@@ -294,7 +294,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
           .child(recipientUid)
           .child('Notifications')
           .child('Incoming Tracking Request')
-          .child(DateTime.now().microsecondsSinceEpoch.toString())
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
           .set({
             'type':'incoming_tracking_request',
             'from':senderUid,

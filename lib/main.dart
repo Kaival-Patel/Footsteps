@@ -39,40 +39,10 @@ class _myAppState extends State<myApp> {
   void initState() {
     super.initState();
     //startFCMService();
-    initFlutterLocalNotifications();
+    
   }
 
-  Future<void> initFlutterLocalNotifications() async {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
-    final InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: selectNotification);
-    createNotificationChannel("tracker_request", "tracker_request",
-        "Notifies about tracker requests");
-  }
-
-  Future<void> createNotificationChannel(
-      String id, String name, String desc) async {
-    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    var androidNotificationChannel = AndroidNotificationChannel(
-      id,
-      name,
-      desc,
-    );
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(androidNotificationChannel);
-  }
-
-  Future<dynamic> selectNotification(String payload) async {
-    print("PAYLOAD:${payload}");
-    print("SHOULD PUSH NOW TO ADD TRACKER!");
-  }
+ 
 
   Future<void> startFCMService() async {
     FirebaseMessaging _fcm = FirebaseMessaging();

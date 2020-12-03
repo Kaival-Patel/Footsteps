@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:footsteps/components/Dialogs/centerBottomToast.dart';
 import 'package:footsteps/config/size_config.dart';
 import 'package:footsteps/config/styling.dart';
@@ -41,7 +43,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   BitmapDescriptor homeIconPin, currentIconPin;
   centerBottomToast cbt = centerBottomToast();
   String sliding_header_title = "Swipe up for trackers management";
-
+  static const platform = MethodChannel('com.kaival.footsteps/getLocation');
   //initState
   @override
   void initState() {
@@ -66,6 +68,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     //initialising shared prefs;
     initSharedPrefs();
 
+    //initialising platform channel bridging native android
+    initPlatformChannel();
+
     //setting up google maps pin icons
     setPinIcons();
     // location.onLocationChanged.listen((LocationData updatedLocation) {
@@ -76,6 +81,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       signOut();
     }
   }
+
+  Future<Null> initPlatformChannel() async {
+    try {
+      final String result = await platform.invokeMethod('getLocation', {
+      "latitude": "lat",
+      "longitude": "long"
+    });
+    print(":::::::::::RESULT FROM NATIVE:${result}");
+    } on PlatformException catch (e) {
+      print("FAILED TO COMMUNICATE WITH NATIVE:${e}");
+    }
+    
+  }
+
+  
 
   //Uploads the location to database
   void uploadCurrentLocation(LatLng currpos) {
@@ -182,8 +202,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           .animateCamera(CameraUpdate.newCameraPosition(initialCameraPosition));
       uploadCurrentLocation(
           LatLng(currentLocation.latitude, currentLocation.longitude));
-      
-        checkforhomeLocationMarked();
+
+      checkforhomeLocationMarked();
     }
   }
 
@@ -194,40 +214,42 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   //checks if user had set the homelocation marker
   Future<void> checkforhomeLocationMarked() async {
-      _database
-          .reference()
-          .child('Users')
-          .child(user.uid.toString())
-          .once()
-          .then((DataSnapshot dataSnapshot) {
-        Map<dynamic, dynamic> values = dataSnapshot.value;
-        print(dataSnapshot.key);
-        if (!values.containsKey('Homelocation') && prefs.getBool('homelocationAlert')==null || prefs.getBool('homelocationAlert')==false) {
-          print("ASKING USER!!");
-          setState(() {
-            isHomeLocationMarked = false;
-          });
-          askUserToSetHomeLocation();
-        } else {
-          //print(values['latitude']);
-          setState(() {
-            _markers.add(Marker(
-                markerId: MarkerId(user.uid),
-                infoWindow: InfoWindow(
-                    snippet: "Home sweet home",
-                    title: "Home Location",
-                    onTap: () {
-                      //TODO: On home icon tapped
-                    }),
-                position: LatLng(
-                    double.parse(
-                        values.values.toList()[0]['latitude'].toString()),
-                    double.parse(
-                        values.values.toList()[0]['longitude'].toString())),
-                icon: homeIconPin));
-          });
-        }
-      });
+    _database
+        .reference()
+        .child('Users')
+        .child(user.uid.toString())
+        .once()
+        .then((DataSnapshot dataSnapshot) {
+      Map<dynamic, dynamic> values = dataSnapshot.value;
+      print(dataSnapshot.key);
+      if (!values.containsKey('Homelocation') &&
+              prefs.getBool('homelocationAlert') == null ||
+          prefs.getBool('homelocationAlert') == false) {
+        print("ASKING USER!!");
+        setState(() {
+          isHomeLocationMarked = false;
+        });
+        askUserToSetHomeLocation();
+      } else {
+        //print(values['latitude']);
+        setState(() {
+          _markers.add(Marker(
+              markerId: MarkerId(user.uid),
+              infoWindow: InfoWindow(
+                  snippet: "Home sweet home",
+                  title: "Home Location",
+                  onTap: () {
+                    //TODO: On home icon tapped
+                  }),
+              position: LatLng(
+                  double.parse(
+                      values.values.toList()[0]['latitude'].toString()),
+                  double.parse(
+                      values.values.toList()[0]['longitude'].toString())),
+              icon: homeIconPin));
+        });
+      }
+    });
   }
 
   //asks the user to set the current location as home
@@ -328,17 +350,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldkey,
-        floatingActionButton:Padding(
-                padding: EdgeInsets.only(top: SizeConfig.heightMultiplier * 5),
-                child: FloatingActionButton(
-                  backgroundColor: AppTheme.appDarkVioletColor,
-                  child: Icon(Icons.edit_location_rounded),
-                  heroTag: "Set as Home Location",
-                  onPressed: () {
-                    askUserToSetHomeLocation();
-                  },
-                ),
-              ),
+        floatingActionButton: Padding(
+          padding: EdgeInsets.only(top: SizeConfig.heightMultiplier * 5),
+          child: FloatingActionButton(
+            backgroundColor: AppTheme.appDarkVioletColor,
+            child: Icon(Icons.edit_location_rounded),
+            heroTag: "Set as Home Location",
+            onPressed: () {
+              askUserToSetHomeLocation();
+            },
+          ),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
         body: Stack(
           children: [
