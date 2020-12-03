@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:footsteps/Services/Authentication/UserRespository.dart';
 import 'package:footsteps/Services/Authentication/auth_service_adapter.dart';
 import 'package:footsteps/Services/Authentication/auth_service.dart';
@@ -10,6 +11,7 @@ import 'package:footsteps/config/size_config.dart';
 import 'package:footsteps/config/styling.dart';
 import 'package:footsteps/screens/Portrait/Home.dart';
 import 'package:footsteps/screens/Portrait/HomePage.dart';
+import 'package:footsteps/screens/Portrait/ManageTracker.dart';
 import 'package:footsteps/screens/Portrait/Sign_in.dart';
 import 'package:footsteps/screens/Portrait/splash.dart';
 import 'package:provider/provider.dart';
@@ -32,10 +34,44 @@ class myApp extends StatefulWidget {
 }
 
 class _myAppState extends State<myApp> {
+  int selectPage = 0;
   @override
   void initState() {
     super.initState();
-    startFCMService();
+    //startFCMService();
+    initFlutterLocalNotifications();
+  }
+
+  Future<void> initFlutterLocalNotifications() async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: selectNotification);
+    createNotificationChannel("tracker_request", "tracker_request",
+        "Notifies about tracker requests");
+  }
+
+  Future<void> createNotificationChannel(
+      String id, String name, String desc) async {
+    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    var androidNotificationChannel = AndroidNotificationChannel(
+      id,
+      name,
+      desc,
+    );
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidNotificationChannel);
+  }
+
+  Future<dynamic> selectNotification(String payload) async {
+    print("PAYLOAD:${payload}");
+    print("SHOULD PUSH NOW TO ADD TRACKER!");
   }
 
   Future<void> startFCMService() async {
@@ -86,91 +122,23 @@ class _myAppState extends State<myApp> {
               ));
         },
         onLaunch: (Map<String, dynamic> message) async {
-          print("onLaunch: $message");
-          showDialog(
-              context: context,
-              child: Container(
-                height: SizeConfig.heightMultiplier * 20,
-                child: AlertDialog(
-                  title: Text(
-                    message['notification']['title'],
-                    style: TextStyle(fontSize: SizeConfig.textMultiplier * 3),
-                  ),
-                  content: Text(message['notification']['body']),
-                  actions: [
-                    ButtonBar(
-                      children: [
-                        FlatButton(
-                          onPressed: () async {
-                            //TODO:When user click yes to approve connection
-                          },
-                          child: Text(
-                            "Yes",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2),
-                          ),
-                          color: AppTheme.appDarkVioletColor,
-                        ),
-                        FlatButton(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "No",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2,
-                                color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ));
+          print("onLaunch:=> ${message['data']['screen']}");
+          if (message['data']['screen'] == "ManageTracker") {
+            setState(() {
+              selectPage = 1;
+              print("SELECTED PAGE:1");
+            });
+          }
           // TODO optional
         },
         onResume: (Map<String, dynamic> message) async {
           print("onResume: $message");
-          showDialog(
-              context: context,
-              child: Container(
-                height: SizeConfig.heightMultiplier * 20,
-                child: AlertDialog(
-                  title: Text(
-                    message['notification']['title'],
-                    style: TextStyle(fontSize: SizeConfig.textMultiplier * 3),
-                  ),
-                  content: Text(message['notification']['body']),
-                  actions: [
-                    ButtonBar(
-                      children: [
-                        FlatButton(
-                          onPressed: () async {
-                            //TODO:When user click yes to approve connection
-                          },
-                          child: Text(
-                            "Yes",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2),
-                          ),
-                          color: AppTheme.appDarkVioletColor,
-                        ),
-                        FlatButton(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "No",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2,
-                                color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ));
+          if (message['data']['screen'] == "ManageTracker") {
+            setState(() {
+              selectPage = 1;
+              print("SELECTED PAGE:1");
+            });
+          }
           // TODO optional
         },
         onBackgroundMessage: fcmTokenManager.myBackgroundMessageHandler);
@@ -257,35 +225,5 @@ class _myAppState extends State<myApp> {
         },
       ),
     );
-    // return Provider<AuthService>(
-    //   create: (_) => AuthServiceAdapter(
-    //     initAuthServiceType: initialAuthServiceType
-    //   ),
-    //   dispose: (_,AuthService authService)=>authService.dispose(),
-    //   child:LayoutBuilder(
-    //     builder: (context, constraints) => OrientationBuilder(
-    //       builder: (context, orientation) {
-    //         SizeConfig().init(constraints, orientation);
-    //         return MaterialApp(
-    //           debugShowCheckedModeBanner: false,
-    //           theme: AppTheme.lightTheme,
-    //           home: splash(),
-    //         );
-    //       },
-    //     ),
-    //   ),
-    // );
-    // return LayoutBuilder(
-    //   builder: (context, constraints) => OrientationBuilder(
-    //     builder: (context, orientation) {
-    //       SizeConfig().init(constraints, orientation);
-    //       return MaterialApp(
-    //         debugShowCheckedModeBanner: false,
-    //         theme: AppTheme.lightTheme,
-    //         home: splash(),
-    //       );
-    //     },
-    //   ),
-    // );
   }
 }

@@ -2,6 +2,7 @@ import 'package:clipboard_manager/clipboard_manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:footsteps/Services/Authentication/FirebaseSignOut.dart';
 import 'package:footsteps/Services/Authentication/UserRespository.dart';
 import 'package:footsteps/components/Dialogs/centerBottomToast.dart';
 import 'package:footsteps/components/ProfileBanner.dart';
@@ -27,6 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   User user;
   Color editIconColor = Colors.grey;
   Icon editIcon, emailIcon;
+  FirebaseSignOut firebaseSignOut = FirebaseSignOut();
   GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey();
   _ProfilePageState({this.user});
   @override
@@ -40,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
     emailCTRL = TextEditingController();
     trackerCodeCTRL = TextEditingController();
     if (_auth.currentUser == null) {
-      signOut();
+      firebaseSignOut.signOut(context);
     } else {
       fetchUserProfile();
     }
@@ -82,15 +84,6 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  void signOut() {
-    userrepo.signOut();
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Sign_In(),
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontSize: SizeConfig.textMultiplier * 1.5,
                     )),
                 onPressed: () {
-                  signOut();
+                  firebaseSignOut.signOut(context);
                 },
                 color: AppTheme.appDarkVioletColor,
               ),

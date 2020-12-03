@@ -56,7 +56,9 @@
             android:value="2" />
         <meta-data android:name="com.google.android.geo.API_KEY"
           android:value="AIzaSyDXtEm6cPrO8V_aWnbKCYAWoBQ0qrZCY9c"/> 
-          
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/tracker_request"/>  
     </application>
     
 </manifest>

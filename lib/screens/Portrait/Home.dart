@@ -37,9 +37,9 @@ class _HomeState extends State<Home>
     WidgetsBinding.instance.addObserver(this);
     ChangeUserStatusToOnline();
     AddBackgroundChannel();
+    print("SELECTED PAGE GOT FROM MAIN:$selectedpage");
     setFCMtoken();
-    //startFCMService();
-    //fcmTokenManager.startFCMService(context);
+    startFCMService();
   }
 
   Future<void> startFCMService() async {
@@ -47,7 +47,7 @@ class _HomeState extends State<Home>
     print("STARTED FCM SERVICE FROM HOME!!!");
     _fcm.configure(
         onMessage: (Map<String, dynamic> message) async {
-          print("onMessage: $message");
+          print("onMessage:=> $message");
           showDialog(
               context: context,
               child: Container(
@@ -90,110 +90,26 @@ class _HomeState extends State<Home>
               ));
         },
         onLaunch: (Map<String, dynamic> message) async {
-          print("onLaunch: $message");
-          showDialog(
-              context: context,
-              child: Container(
-                height: SizeConfig.heightMultiplier * 20,
-                child: AlertDialog(
-                  title: Text(
-                    message['notification']['title'],
-                    style: TextStyle(fontSize: SizeConfig.textMultiplier * 3),
-                  ),
-                  content: Text(message['notification']['body']),
-                  actions: [
-                    ButtonBar(
-                      children: [
-                        FlatButton(
-                          onPressed: () async {
-                            //TODO:When user click yes to approve connection
-                          },
-                          child: Text(
-                            "Yes",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2),
-                          ),
-                          color: AppTheme.appDarkVioletColor,
-                        ),
-                        FlatButton(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "No",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2,
-                                color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ));
+          print("onLaunch:=> ${message['data']['screen']}");
+          if (message['data']['screen'] == "ManageTracker") {
+            setState(() {
+              selectedpage = 1;
+              print("SELECTED PAGE:1");
+            });
+          }
           // TODO optional
         },
         onResume: (Map<String, dynamic> message) async {
           print("onResume: $message");
-          showDialog(
-              context: context,
-              child: Container(
-                height: SizeConfig.heightMultiplier * 20,
-                child: AlertDialog(
-                  title: Text(
-                    message['notification']['title'],
-                    style: TextStyle(fontSize: SizeConfig.textMultiplier * 3),
-                  ),
-                  content: Text(message['notification']['body']),
-                  actions: [
-                    ButtonBar(
-                      children: [
-                        FlatButton(
-                          onPressed: () async {
-                            //TODO:When user click yes to approve connection
-                          },
-                          child: Text(
-                            "Yes",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2),
-                          ),
-                          color: AppTheme.appDarkVioletColor,
-                        ),
-                        FlatButton(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "No",
-                            style: TextStyle(
-                                fontSize: SizeConfig.textMultiplier * 2,
-                                color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ));
+          if (message['data']['screen'] == "ManageTracker") {
+            setState(() {
+              selectedpage = 1;
+              print("SELECTED PAGE:1");
+            });
+          }
           // TODO optional
         },
         onBackgroundMessage: fcmTokenManager.myBackgroundMessageHandler);
-  }
-
-  Future<dynamic> myBackgroundMessageHandler(
-      Map<String, dynamic> message) async {
-    if (message.containsKey('data')) {
-      // Handle data message
-      final dynamic data = message['data'];
-    }
-
-    if (message.containsKey('notification')) {
-      // Handle notification message
-      final dynamic notification = message['notification'];
-    }
-    print(message);
-
-    // Or do other work.
   }
 
   Future<String> setFCMtoken() async {
