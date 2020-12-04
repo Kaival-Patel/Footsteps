@@ -42,8 +42,7 @@
               />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-                
+                <category android:name="android.intent.category.LAUNCHER"/>         
             </intent-filter>
             <intent-filter>
                 <action android:name="FLUTTER_NOTIFICATION_CLICK" />
@@ -64,6 +63,7 @@
         <service
           android:name=".MyLocationService"
           android:enabled="true"
+          
           android:exported="true"/>
     </application>
     

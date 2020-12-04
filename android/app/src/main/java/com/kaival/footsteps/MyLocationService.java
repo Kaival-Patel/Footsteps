@@ -113,17 +113,20 @@ public class MyLocationService extends Service {
     //@RequiresApi(api = Build.VERSION_CODES.O)
     private Notification getNotification() {
 
-        NotificationChannel channel = new NotificationChannel("channel_01", "My Channel", NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channel = new NotificationChannel("Live Location", "Location Channel", NotificationManager.IMPORTANCE_DEFAULT);
 
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
 
-        Notification.Builder builder = new Notification.Builder(getApplicationContext(), "channel_01")
+        Intent notificationIntent = new Intent(MyLocationService.this, Application.class);
+        PendingIntent intent = PendingIntent.getActivity(MyLocationService.this, 0, notificationIntent, 0);
+        Notification.Builder builder = new Notification.Builder(getApplicationContext(), "Live Location")
         .setSmallIcon(R.drawable.app_icon)
         .setContentTitle("Location Tracking")
-        .setTicker("Alarm is set to ring")
+        .setTicker("Location")
         .setContentText("Tracking your location in background")
         .setWhen(System.currentTimeMillis())
+        .setContentIntent(intent)
         .setAutoCancel(true);
         
         return builder.build();
