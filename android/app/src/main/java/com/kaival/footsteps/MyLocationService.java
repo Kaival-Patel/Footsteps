@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.app.PendingIntent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -118,11 +119,11 @@ public class MyLocationService extends Service {
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
 
-        Intent notificationIntent = new Intent(MyLocationService.this, Application.class);
-        PendingIntent intent = PendingIntent.getActivity(MyLocationService.this, 0, notificationIntent, 0);
+        Intent notificationIntent = new Intent(MyLocationService.this, MainActivity.class);
+        PendingIntent intent = PendingIntent.getActivity(MyLocationService.this, 0, notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(getApplicationContext(), "Live Location")
         .setSmallIcon(R.drawable.app_icon)
-        .setContentTitle("Location Tracking")
+        .setContentTitle("Location tracking")
         .setTicker("Location")
         .setContentText("Tracking your location in background")
         .setWhen(System.currentTimeMillis())
